@@ -9,6 +9,7 @@ import com.auth0.android.authentication.AuthenticationException
 import com.auth0.android.authentication.PasswordlessType
 import com.auth0.android.callback.BaseCallback
 import com.auth0.android.result.Credentials
+import com.google.firebase.auth.FirebaseAuth
 import no.lagos.mvptest.interfaces.MainMVP
 import no.lagos.mvptest.model.MainModel
 import no.lagos.mvptest.model.Note
@@ -24,6 +25,8 @@ class MainPresenter(view: MainMVP.ViewOps, val context: Context) : MainMVP.Prese
     private val model: MainMVP.ModelOps
     private var isChangingConfig = true
     val account: Auth0 by lazy { Auth0(context) }
+    val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
+    lateinit var jwt: Credentials
     val authentication: AuthenticationAPIClient by lazy { AuthenticationAPIClient(account) }
     lateinit var phoneNumber: String
 
@@ -89,18 +92,43 @@ class MainPresenter(view: MainMVP.ViewOps, val context: Context) : MainMVP.Prese
     }
 
     override fun sendOTP(otp: String) {
+
         authentication.loginWithPhoneNumber(phoneNumber, otp)
                 .start(object : BaseCallback<Credentials, AuthenticationException> {
                     override fun onSuccess(payload: Credentials?) {
                         Log.d(TAG, "Login in!. Credentials: AccessToken ${payload?.accessToken}")
 
+                        if(payload != null){
+                            jwt = payload
+                        }
 
+                        authentication.delegationWithIdToken(jwt.idToken as String, "firebase")
+                                .start(object : BaseCallback<Map<String, Any>, AuthenticationException> {
+                                    override fun onFailure(error: AuthenticationException?) {
+                                        Log.w(TAG, "Something went wrong. $error")
+                                    }
+
+                                    override fun onSuccess(payload: Map<String, Any>) {
+                                        Log.d(TAG, "Got the payload $payload")
+                                        val id_token = payload.get("id_token") as String
+                                        auth.signInWithCustomToken(id_token).addOnCompleteListener { task ->
+                                            if(task.isSuccessful){
+                                                Log.d(TAG, "Successfully registered token ${task.result.user}")
+                                            } else {
+                                                Log.w(TAG, "Something went wrong. ")
+                                            }
+                                        }
+                                    }
+
+                                })
                     }
 
                     override fun onFailure(error: AuthenticationException?) {
                         Log.d(TAG, "Failed login ${error.toString()}")
                     }
                 })
+
+
     }
 
     override fun wrongOTP(msg: String) {
