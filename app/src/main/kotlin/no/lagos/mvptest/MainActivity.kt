@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity(), MainMVP.ViewOps {
         otp_button.isEnabled = true
     }
 
-    val presenter: MainMVP.PresenterInterface = MainPresenter(view = this)
+    val presenter: MainMVP.PresenterInterface by lazy { MainPresenter(this, applicationContext) }
 
     override fun showToast(msg: String) {
         Toast.makeText(applicationContext, msg, Toast.LENGTH_SHORT).show()
@@ -26,6 +26,19 @@ class MainActivity : AppCompatActivity(), MainMVP.ViewOps {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         presenter.newNote("Ny melding")
+        setClickListener()
+    }
+
+    fun setClickListener(){
+        phone_button.setOnClickListener {
+            val phoneNumber = phone.text.toString()
+            presenter.sendPhone(phoneNumber)
+        }
+
+        otp_button.setOnClickListener {
+            val otp_text = OTP.text.toString()
+            presenter.sendOTP(otp_text)
+        }
 
     }
 }
