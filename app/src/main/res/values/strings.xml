@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">MVP test</string>
     <string name="title_activity_maps">Map</string>
-    <string name="com_auth0_client_id">QEKb4uUluz6GP20Y9OXLvWEuwo1gw9Zx</string>
-    <string name="com_auth0_domain">hafslundbouvet.eu.auth0.com</string>
+    <string name="com_auth0_client_id">19rUZE3H0a0dJTIL2V1TySSFJRIcT3oS</string>
+    <string name="com_auth0_domain">hafslunddev.eu.auth0.com</string>
 </resources>

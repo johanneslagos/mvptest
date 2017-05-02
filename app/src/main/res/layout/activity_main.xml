@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:hint="Phone"
             android:inputType="phone"
-            tools:text="95889824"/>
+            />
     </android.support.design.widget.TextInputLayout>
 
     <Button
