@@ -94,9 +94,11 @@ class MainPresenter(view: MainMVP.ViewOps, val context: Context) : MainMVP.Prese
     override fun sendOTP(otp: String) {
 
         authentication.loginWithPhoneNumber(phoneNumber, otp)
+                .setScope("openid offline_access").setDevice(phoneNumber)
                 .start(object : BaseCallback<Credentials, AuthenticationException> {
                     override fun onSuccess(payload: Credentials?) {
-                        Log.d(TAG, "Login in!. Credentials: AccessToken ${payload?.accessToken}")
+                        Log.d(TAG, "PAyload: ${payload.toString()}")
+                        Log.d(TAG, "Login in!. Credentials: AccessToken ${payload?.accessToken}, Id Token ${payload?.idToken}, Refresh Token ${payload?.refreshToken}")
 
                         if(payload != null){
                             jwt = payload
