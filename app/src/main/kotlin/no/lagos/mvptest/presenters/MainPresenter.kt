@@ -9,6 +9,7 @@ import com.auth0.android.authentication.AuthenticationException
 import com.auth0.android.authentication.PasswordlessType
 import com.auth0.android.callback.BaseCallback
 import com.auth0.android.result.Credentials
+import com.auth0.android.result.UserProfile
 import com.google.firebase.auth.FirebaseAuth
 import no.lagos.mvptest.interfaces.MainMVP
 import no.lagos.mvptest.model.MainModel
@@ -93,11 +94,11 @@ class MainPresenter(view: MainMVP.ViewOps, val context: Context) : MainMVP.Prese
 
     override fun sendOTP(otp: String) {
 
+
         authentication.loginWithPhoneNumber(phoneNumber, otp)
-                .setScope("openid offline_access").setDevice(phoneNumber)
+                .setScope("openid offline_access customerIDTesting").setDevice(phoneNumber)
                 .start(object : BaseCallback<Credentials, AuthenticationException> {
                     override fun onSuccess(payload: Credentials?) {
-                        Log.d(TAG, "PAyload: ${payload.toString()}")
                         Log.d(TAG, "Login in!. Credentials: AccessToken ${payload?.accessToken}, Id Token ${payload?.idToken}, Refresh Token ${payload?.refreshToken}")
 
                         if(payload != null){
@@ -123,6 +124,18 @@ class MainPresenter(view: MainMVP.ViewOps, val context: Context) : MainMVP.Prese
                                     }
 
                                 })
+                        authentication.userInfo(jwt.accessToken as String)
+                                .start(object : BaseCallback<UserProfile, AuthenticationException>{
+                            override fun onFailure(error: AuthenticationException?) {
+                                Log.w(TAG, "Something went wrong")
+                            }
+
+                            override fun onSuccess(payload: UserProfile?) {
+                                //This is for extract the customerIdTesting.
+                                Log.d(TAG, "User ${payload?.extraInfo!!["customerIDTesting"]}")
+                            }
+
+                        })
                     }
 
                     override fun onFailure(error: AuthenticationException?) {
@@ -138,3 +151,4 @@ class MainPresenter(view: MainMVP.ViewOps, val context: Context) : MainMVP.Prese
     }
 
 }
+
