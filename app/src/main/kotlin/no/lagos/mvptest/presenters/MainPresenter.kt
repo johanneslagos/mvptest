@@ -96,7 +96,7 @@ class MainPresenter(view: MainMVP.ViewOps, val context: Context) : MainMVP.Prese
 
 
         authentication.loginWithPhoneNumber(phoneNumber, otp)
-                .setScope("openid offline_access customerIDTesting").setDevice(phoneNumber)
+                .setScope("openid offline_access customerID").setDevice(phoneNumber)
                 .start(object : BaseCallback<Credentials, AuthenticationException> {
                     override fun onSuccess(payload: Credentials?) {
                         Log.d(TAG, "Login in!. Credentials: AccessToken ${payload?.accessToken}, Id Token ${payload?.idToken}, Refresh Token ${payload?.refreshToken}")
@@ -132,14 +132,15 @@ class MainPresenter(view: MainMVP.ViewOps, val context: Context) : MainMVP.Prese
 
                             override fun onSuccess(payload: UserProfile?) {
                                 //This is for extract the customerIdTesting.
-                                Log.d(TAG, "User ${payload?.extraInfo!!["customerIDTesting"]}")
+                                Log.d(TAG, "User ${payload?.extraInfo!!["customerID"]}")
                             }
 
                         })
                     }
 
                     override fun onFailure(error: AuthenticationException?) {
-                        Log.d(TAG, "Failed login ${error.toString()}")
+
+                        Log.d(TAG, "Failed login ${error?.description}")
                     }
                 })
 
